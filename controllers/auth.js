@@ -20,7 +20,7 @@ exports.getLogin = (req, res, next) => {
     // console.log(req.get('Cookie').split('=')[1])
 
     // However, we have an [issue] here.
-    // In the browser, the cookie value can be manipulated by a user.
+    // In the browser, the cookie value can be manipulated by a user. ***
     // for instance, when the user would set loggedIn=false,
     //  The follwing value would return false.
     // Then cookie would not work.  
@@ -51,11 +51,13 @@ exports.postLogin = (req, res, next) => {
     // ------------------------------------------------------------
     // 2) Session
     // In case of session, we can use req....
-    // It is initialized in app.js and added to req object
-    //  we can implements this session data at any routes.
+    //  because we setup the session initialization with "app.use(session({ ... }))"" in app.js.
+    // It is initialized and then results in making the "req.sessiond" field
+    //  we can implement this session field at any routes.
     // "connect.sid" in cookie of the browser is shown up.
 
-    // sending cookie value to the brwoser not by express but express-session
+    // sending encrypted value to the cookie of the brwoser not by express but express-session
+    //  ***** Encrypted value : secret in app.use(session) + key value
     //  by entering session fileds like the one below.
     // req.session.isAuthenticated = true;
 
@@ -84,6 +86,7 @@ exports.postLogin = (req, res, next) => {
     //  in every request!!!!!!! by using "req.header"!!!! 
     //  as long as the cookie is expired.
      
+    // [ SETUP ]
     // set up A cookie in the browser by SENDING cookie VALUE.
     // the first parameter is a built-in paramter for cookie.
     // the second paramter can be built by us.

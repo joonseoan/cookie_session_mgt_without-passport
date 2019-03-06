@@ -26,8 +26,8 @@ const Mongo_URI = `mongodb+srv://joon:${mongoKey}@firstatlas-drwhc.mongodb.net/s
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-
 /* 
+  // When session data is created.... in mongodb
 
   _id: "Sr5H66Ieud9JLHhUmymKb51iABX_yg_i"
   expires: 2019-03-20T19:42:39.295+00:00
@@ -41,14 +41,15 @@ app.use(express.static(path.join(__dirname, 'public')));
     path: "/"
     sameSite: null
   }
-  isAuthenticated: true ==>>> we set it up 
+  isAuthenticated: true ==>>> we set it up  // set up by us
 
 */
+// create collection to store session data including cookie
 const store = new mongoStore({
   uri: Mongo_URI,
   collection: 'sessions'
+});
 
-})
 // resave:false : as long as session data is not switched,
 //  it is not going to be saved.
 // saveUninitialized: false: until the req requests the session to be saved,
