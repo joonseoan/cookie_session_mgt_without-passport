@@ -49,7 +49,7 @@ exports.getIndex = (req, res, next) => {
 exports.getCart = (req, res, next) => {
 
   console.log(req.session.user.cart.items)
-  req.session.user
+  req.user
     .populate('cart.items.productId')
     .execPopulate()
     .then(user => {
@@ -68,7 +68,13 @@ exports.postCart = (req, res, next) => {
   const prodId = req.body.productId;
   Product.findById(prodId)
     .then(product => {
-      return req.session.user.addToCart(product);
+
+      // { cart: { items: [ [Object] ] },
+      console.log('typeof req.session.user', req.session.user)
+      
+      // Therefore we must use req.user.
+      // Please, you must find the auth postLogin controller to understand it.
+      return req.user.addToCart(product);
     })
     .then(result => {
       console.log(result);
@@ -78,7 +84,8 @@ exports.postCart = (req, res, next) => {
 
 exports.postCartDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  req.session.user
+  // also, req.user must be used
+  req.user
     .removeFromCart(prodId)
     .then(result => {
       res.redirect('/cart');
@@ -87,16 +94,17 @@ exports.postCartDeleteProduct = (req, res, next) => {
 };
 
 exports.postOrder = (req, res, next) => {
-  req.session.user
+  req.user
+    // populate must work with mongoose instance
     .populate('cart.items.productId')
     .execPopulate()
     .then(user => {
       const products = user.cart.items.map(i => {
-        return { quantity: i.quantity, product: { ...i.productId._doc } };
+        return { qty: i.qty, product: { ...i.productId._doc } };
       });
       const order = new Order({
         user: {
-          name: req.session.user.name,
+          name: req.session.user.username,
           userId: req.session.user
         },
         products: products
@@ -104,7 +112,8 @@ exports.postOrder = (req, res, next) => {
       return order.save();
     })
     .then(result => {
-      return req.session.user.clearCart();
+        // also, req.user must be used
+      return req.user.clearCart();
     })
     .then(() => {
       res.redirect('/orders');

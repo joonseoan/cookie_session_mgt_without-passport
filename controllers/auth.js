@@ -61,11 +61,59 @@ exports.postLogin = (req, res, next) => {
     //  by entering session fileds like the one below.
     // req.session.isAuthenticated = true;
 
-    // [Assignment]
+    // [Assignment]d
     User.findById('5c7ff22830149705b40657f0')
         .then(user => {
             req.session.isAuthenticated = true;
+
+            // user: "object"
+            console.log('typeof User', typeof user);
+
+            // the object is assigned to session database and cookie
+            //  1) For the cookie in the browser, the encrypted _id is stored.
+            //  2) In the database, the all user object is going to be stored.
             req.session.user = user;
+
+            /* **************************************************************88
+            
+                In the routes, at postCart().
+
+                req.session.user: "{ cart: { items: [ [Object] ] }""
+                
+                // which is the one below
+                
+                // that is, it a just fetching data with manipulation 
+                //  then stored in database.
+                // It does not have defined mongoose schema
+                // At this point of view, we can not invoke 
+                //  mongoose schema methods with 'req.session.user'
+
+                user:Object
+                    cart: Object
+                        items : Array 0
+                        : Object
+                            _id: 5c801c35f71dea2f78594c72
+                            productId: 5c7ff3b56e6b513590be60c2
+                            qty: 1
+                            _id : 5c7ff22830149705b40657f0
+                            username: "joon"
+                            email: "joon@test.com"
+                            __v:2
+
+                console.log(typeof req.session.user)
+
+                req.session.user.addToCart(product);
+            
+            
+            */
+            // normally we do not need to forcely save for the session collection
+            //  However, sometime when the db is not quickly responsive,
+            //  redirect can be run before the session storage is made out.
+            // Only for the redirect and just in case, we need to set this up
+            return req.session.save();                
+
+        })
+        .then(() => {
             res.redirect('/');
         })
         .catch(err =>  { throw new Error('Unable to log in.'); });
@@ -105,4 +153,30 @@ exports.postLogin = (req, res, next) => {
     // res.setHeader('Set-Cookie', 'loggedIn=true; Max-Age=10');
 
     // res.redirect('/');
+}
+
+// Logout when using session
+// Clear Session can be run by session middleware
+// Then, remove cookie in the browser
+// Both should be done to run logout. 
+exports.postLogout = (req, res, next) => {
+    console.log('working!!!!!!!!!!?')
+    // .destroy is a middleware from session lib.
+    // For now, it get rid of the current session document in db.
+    // Therefore, cookie in browser is still available,
+    //  the client can't automatically log in again
+    //  because of a count partner (session db) of session
+    //  is not availalbe. 
+
+    // By the way, when the browser is closed, cookie in the browse
+    // will be deleted.
+
+    // When new request (log in by entering email and passwor) 
+    //  from the client is created, new the session will create 
+    //  new cookie encrypted key and user information and send them to the browser
+    //  and the identified cookie information will be copied to the db. 
+    req.session.destroy((err) => {
+        if(err) throw new Error(err);
+        res.redirect('/');
+    });
 }

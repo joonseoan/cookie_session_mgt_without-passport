@@ -19,7 +19,9 @@ exports.postAddProduct = (req, res, next) => {
     price: price,
     description: description,
     imageUrl: imageUrl,
-    userId: req.session.user
+    // ref is assined in schema
+    // Better to use req.user
+    userId: req.user
   });
   product
     .save()

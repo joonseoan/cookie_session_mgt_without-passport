@@ -56,15 +56,37 @@ const store = new mongoStore({
 //  it is not going to be saved.
 app.use(session({secret: 'asfasdfsafdsa', resave: false, saveUninitialized: false, store }));
 
-// moved to login route
 // app.use((req, res, next) => {
-//   User.findById('5c7ff22830149705b40657f0')
-//     .then(user => {
-//       req.user = user;
-//       next();
-//     })
-//     .catch(err => console.log(err));
+//   // if(req.session.isAuthenticated) {
+//     User.findById('5c7ff22830149705b40657f0')
+//       .then(user => {
+//         req.user = user
+//       });
+//   //}
 // });
+
+
+
+
+// moved to login route
+app.use((req, res, next) => {
+
+  if(req.session.user) {
+
+    // We can get req.session.user._id only when user logged in 
+    //  stores the session data in db.
+    //  Therefore, we do not need to get req.session.isAuthenticated.
+      User.findById(req.session.user._id)
+        .then(user => {
+          req.user = user;
+          next();
+        })
+        .catch(err => console.log(err));
+  } else {
+    next();
+  }
+  
+});
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
