@@ -62,7 +62,7 @@ exports.postLogin = (req, res, next) => {
     // req.session.isAuthenticated = true;
 
     // [Assignment]d
-    User.findById('5c7ff22830149705b40657f0')
+    User.findById('5c81b725ad17ef2cd0824c3d')
         .then(user => {
             req.session.isAuthenticated = true;
 

@@ -100,6 +100,8 @@ exports.postOrder = (req, res, next) => {
     .execPopulate()
     .then(user => {
       const products = user.cart.items.map(i => {
+        console.log('without_dddddddddddddddddddoooooooooooooooocccccccccccccccccc: ', i.productId)
+        console.log('with_dddddddddddddddddoooooooooooooooooccccccccccccccccccc: ', i.productId._doc)
         return { qty: i.qty, product: { ...i.productId._doc } };
       });
       const order = new Order({
@@ -125,7 +127,7 @@ exports.getOrders = (req, res, next) => {
   Order.find({ 'user.userId': req.session.user._id })
     .then(orders => {
 
-      console.log(orders)
+      //console.log(orders)
       res.render('shop/orders', {
         path: '/orders',
         pageTitle: 'Your Orders',
